@@ -1,0 +1,114 @@
+---
+title: "Panel Data Quiz 1"
+author: "Anya Nash"
+date: "2026-04-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+# Load needed libraries
+library(fredr)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r, include=FALSE}
+# Fetching data with the API
+fredr_set_key("1722c54ca4bf409e8c4172f84da20227")
+
+# GDP Per Capita
+gdp_us <- fredr(series_id = "A939RX0Q048SBEA", 
+        observation_start = as.Date("2000-01-01")
+        )
+gdp_sa <- fredr(series_id = "PCAGDPZAA646NWDB",
+        observation_start = as.Date("2000-01-01")
+        )
+
+# Interest Rate
+int_us <- fredr(series_id = "FEDFUNDS",
+        observation_start = as.Date ("2000-01-01")        
+        )
+int_sa <- fredr(series_id = "IRSTCB01ZAM156N",
+        observation_start = as.Date ("2000-01-01")           
+        )
+
+```
+
+
+
+# Plot 1: USA and SA GDP per Capita Over Time
+```{r}
+# Extract date & GDP, & add column to identify the country
+df_gdp_us <- gdp_us %>% 
+  select(date, value) %>% 
+  mutate(Country = "US")
+
+df_gdp_sa <- gdp_sa %>% 
+  select(date, value) %>% 
+  mutate(Country = "SA")
+
+# Stack them together into one "long" dataframe
+plot_data_gdp <- bind_rows(df_gdp_us, df_gdp_sa)
+
+# Build the plot
+ggplot(plot_data_gdp, aes(x = date, y = value, color = Country)) + 
+    geom_line(linewidth = 1) +
+    scale_y_continuous(
+    labels = scales::comma
+    ) +
+    theme_minimal() +
+    theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+    ) +
+    labs(
+    title = "GDP per Capita Over Time: US and SA",
+    x = "Year",
+    y = "GDP per Capita",
+    color = "Country"
+    )
+```
+As evident in the graph above, the US's GDP per capita is significantly higher than SA's GDP per capita. 
+The US's GDP per capita has grown relatively consistently since 2000, except for a brief decline in 2008 to 2009 due to the global financial crisis, and again a sharp decline in 2020 to 2021, due to the Covid-19 pandemic.
+SA's GDP per capita experienced some slow growth from 2000 to 2010, however, since then, GDP per capita has remained at nearly the same level, with a small decline in 2020 due to the pandemic.
+
+
+# Plot 2: USA and SA Interest Rate Over Time
+```{r}
+# Extract date & GDP, & add column to identify the country
+df_int_us <- int_us %>% 
+  select(date, value) %>% 
+  mutate(Country = "US")
+
+df_int_sa <- int_sa %>% 
+  select(date, value) %>% 
+  mutate(Country = "SA")
+
+# Stack them together into one "long" dataframe
+plot_data_int <- bind_rows(df_int_us, df_int_sa)
+
+# Build the plot
+ggplot(plot_data_int, aes(x = date, y = value, color = Country)) + 
+    geom_line(linewidth = 1) +
+    scale_y_continuous(
+    labels = scales::comma
+    ) +
+    theme_minimal() +
+    theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+    ) +
+    labs(
+    title = "Interest Rate per Capita Over Time: US and SA",
+    x = "Year",
+    y = "Interest Rate",
+    color = "Country"
+    )
+```
+The USA's interest rate is significantly lower than SA's interest rate. Despite this large difference between the two country's interest rates, their interest rates follow similar trends, experiencing sharp fluctuations at around the same time. This highlights the global nature of interest rates. There were sharp increases in interest rates during the global financial crisis, in 2008, and sharp declines in interest rates in 2020, due to the Covid-19 pandemic. Recently, though, the interest rates of these two countries are getting closer together, with the US's interest rates increasing slightly and SA's interest rates declining. It will be interesting to observe to see whether these patterns continue in the next few years. 
+
